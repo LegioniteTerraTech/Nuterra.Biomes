@@ -1,10 +1,10 @@
 {
-    "Id": "nuterra.biomes",
-    "DisplayName": "Nuterra Biomes Injector Library",
+    "Id": "nuterra.world",
+    "DisplayName": "Nuterra World Injector Library",
     "Author": "Exund",
     "Version": "1.0.0",
     "Enable": true,
-    "AssemblyName": "Nuterra.Biomes.dll",
-    "EntryMethod": "Nuterra.Biomes.Bootstrapper.Load",
+    "AssemblyName": "NuterraWorld.dll",
+    "EntryMethod": "KickstartWorld.Init",
     "Priority": "First"
 }
