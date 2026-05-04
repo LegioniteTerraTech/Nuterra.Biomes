@@ -65,7 +65,7 @@ namespace Nuterra.World
         {
             try
             {
-                ManUI.inst.ShowErrorPopup("[" + ModName + "] ENCOUNTERED CRITICAL ERROR: " + e + StackTraceUtility.ExtractStackTrace());
+                ManModGUI.ShowErrorPopup("[" + ModName + "] ENCOUNTERED CRITICAL ERROR: " + e + StackTraceUtility.ExtractStackTrace());
             }
             catch { }
             Debug.Log("[" + ModName + "] ENCOUNTERED CRITICAL ERROR: " + e);

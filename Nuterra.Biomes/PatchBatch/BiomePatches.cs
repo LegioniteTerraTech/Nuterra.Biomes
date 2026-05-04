@@ -15,40 +15,6 @@ namespace Nuterra.World.PatchBatch
     /// </summary>
     internal class BiomePatches
     {
-        internal static class ModeMain_Patches
-        {
-            internal static Type target = typeof(ModeMain);
-            /// <summary>
-            /// PatchTankToAllowLocoEngine
-            /// </summary>
-            [HarmonyPriority(-9001)]
-            static void SetupModeLoadSaveListeners_Postfix(ref ModeMain __instance, ref TechAudio.UpdateAudioCache cache)
-            {
-                __instance.SubscribeToEvents(ManModBiomes.biomeSaveManager);
-            }
-            static void CleanupModeLoadSaveListeners_Postfix(ref ModeMain __instance)
-            {
-                __instance.UnsubscribeFromEvents(ManModBiomes.biomeSaveManager);
-            }
-        }
-        internal static class ModeMisc_Patches
-        {
-            internal static Type target = typeof(ModeMisc);
-            /// <summary>
-            /// PatchTankToAllowLocoEngine
-            /// </summary>
-            [HarmonyPriority(-9001)]
-            static void SetupModeLoadSaveListeners_Postfix(ref ModeMisc __instance, ref TechAudio.UpdateAudioCache cache)
-            {
-                if (__instance.GetGameType() == ManGameMode.GameType.Creative)
-                    __instance.SubscribeToEvents(ManModBiomes.biomeSaveManager);
-            }
-            static void CleanupModeLoadSaveListeners_Postfix(ref ModeMisc __instance)
-            {
-                if (__instance.GetGameType() == ManGameMode.GameType.Creative)
-                    __instance.UnsubscribeFromEvents(ManModBiomes.biomeSaveManager);
-            }
-        }
         internal static class UIScreenNewGame_Patches
         {
             internal static Type target = typeof(UIScreenNewGame);
@@ -74,6 +40,18 @@ namespace Nuterra.World.PatchBatch
             {
                 ManModBiomes.selector.Reset();
                 ManModBiomes.selector.useGUILayout = false;
+            }
+        }
+        internal static class AddOceanicBiomes_Patches
+        {
+            internal static Type target = typeof(BiomeMap);
+            /// <summary>
+            /// PatchTankToAllowLocoEngine
+            /// </summary>
+            [HarmonyPriority(-9001)]
+            internal static void GetBiomeDB_Prefix(BiomeMap __instance)
+            {
+                BiomeGeneration.OnBiomesReloaded(__instance);
             }
         }
 

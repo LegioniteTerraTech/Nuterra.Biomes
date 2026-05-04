@@ -15,18 +15,25 @@ namespace Nuterra.World.Biomes
         internal static List<BiomeGroupItem> groups = new List<BiomeGroupItem>();
         internal static List<BiomeItem> biomes = new List<BiomeItem>();
 
-        internal void Start()
+        internal void Resync()
         {
-            if(ManModBiomes.userResources.TryGetValue(typeof(BiomeGroup), out var customGroups)) {
-                groups = customGroups.Select(i => new BiomeGroupItem() { enabled = false, group = (BiomeGroup)i.Value }).ToList();
+            bool defaultState = true;
+            if (ManModBiomes.userResources.TryGetValue(typeof(BiomeGroup), out var customGroups)) {
+                groups = customGroups.Select(i => new BiomeGroupItem() { enabled = defaultState, group = (BiomeGroup)i.Value }).ToList();
             }
 
             if (ManModBiomes.biomeWrappers.Count > 0)
             {
-                biomes = ManModBiomes.biomeWrappers.Select(i => new BiomeItem() { enabled = false, biome = i }).ToList();
+                biomes = ManModBiomes.biomeWrappers.Select(i => new BiomeItem() { enabled = defaultState, biome = i }).ToList();
             }
         }
 
+
+        internal void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F6))
+                useGUILayout = !useGUILayout;
+        }
         internal void OnGUI()
         {
             if (!useGUILayout)
@@ -44,7 +51,11 @@ namespace Nuterra.World.Biomes
                 {
                     foreach (var item in groups)
                     {
-                        item.enabled = GUILayout.Toggle(item.enabled, item.group.name);
+                        GUILayout.BeginHorizontal();
+                        if (GUILayout.Button(item.group.name))
+                            ManModBiomes.FORCE_THIS_BIOMEGROUP_LOADED_IMMEDEATE(item.group);
+                        item.enabled = GUILayout.Toggle(item.enabled, string.Empty);
+                        GUILayout.EndHorizontal();
                     }
                 }
                 GUILayout.EndScrollView();
@@ -57,7 +68,11 @@ namespace Nuterra.World.Biomes
                 {
                     foreach (var item in biomes)
                     {
-                        item.enabled = GUILayout.Toggle(item.enabled, item.biome.biome.name);
+                        GUILayout.BeginHorizontal();
+                        if (GUILayout.Button(item.biome.biome.name))
+                            ManModBiomes.FORCE_THIS_BIOME_LOADED_IMMEDEATE(item.biome.biome);
+                        item.enabled = GUILayout.Toggle(item.enabled, string.Empty);
+                        GUILayout.EndHorizontal();
                     }
                 }
                 GUILayout.EndScrollView();
@@ -69,27 +84,25 @@ namespace Nuterra.World.Biomes
 
         public void Reset()
         {
+            bool defaultState = true;
+
             foreach (var biome in biomes)
-            {
-                biome.enabled = false;
-            }
+                biome.enabled = defaultState;
 
             foreach (var group in groups)
-            {
-                group.enabled = false;
-            }
+                group.enabled = defaultState;
         }
 
         internal class BiomeGroupItem
         {
             public BiomeGroup group;
-            public bool enabled;
+            public bool enabled = true;
         }
 
         internal class BiomeItem
         {
             public BiomeWrapper biome;
-            public bool enabled;
+            public bool enabled = true;
         }
     }
 }

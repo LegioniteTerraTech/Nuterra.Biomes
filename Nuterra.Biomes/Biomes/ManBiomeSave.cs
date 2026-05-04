@@ -2,58 +2,104 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SafeSaves;
 
 namespace Nuterra.World.Biomes
 {
-    class ManBiomeSave : Mode.IManagerModeEvents
+    [AutoSaveManager]
+    public class ManBiomeSave
     {
-        static FieldInfo m_Biomes = ManModBiomes.BiomeGroup_fields.First(f => f.Name == "m_Biomes");
-        static FieldInfo m_BiomeWeights = ManModBiomes.BiomeGroup_fields.First(f => f.Name == "m_BiomeWeights");
+        [SSManagerInst]
+        public static ManBiomeSave inst = new ManBiomeSave();
 
-        static Type BiomeMap_T = typeof(BiomeMap);
+        static FieldInfo m_Biomes = null;
+        static FieldInfo m_BiomeWeights = null;
 
-        static FieldInfo m_BiomeGroups = BiomeMap_T.GetField("m_BiomeGroups", BindingFlags.NonPublic | BindingFlags.Instance);
-        static FieldInfo m_BiomeGroupDatabase = BiomeMap_T.GetField("m_BiomeGroupDatabase", BindingFlags.NonPublic | BindingFlags.Instance);
+        static Type BiomeMap_T = default;
+
+        static FieldInfo m_BiomeGroups = null;
+        static FieldInfo m_BiomeGroupDatabase = null;
 
 
         static ManSaveGame.SaveDataJSONType saveType = (ManSaveGame.SaveDataJSONType)7000;
 
-        SaveData data = new SaveData();
-        BiomeGroup[] injectedGroups = new BiomeGroup[0];
-        BiomeWrapper[] injectedBiomes = new BiomeWrapper[0];
+        public string[] biomes = new string[0];
+        public string[] groups = new string[0];
+        private void ResetData()
+        {
+            biomes = new string[0];
+            groups = new string[0];
+        }
+        static BiomeGroup[] injectedGroups = new BiomeGroup[0];
+        static BiomeWrapper[] injectedBiomes = new BiomeWrapper[0];
 
         bool addSaveData = false;
 
-        public void ModeExit()
+        /// <summary>
+        /// Sanity Check!
+        /// </summary>
+        static void SanityCheck()
+        {
+            if (m_BiomeGroupDatabase != null)
+                return;
+            if (ManModBiomes.BiomeGroup_fields == null)
+                throw new NullReferenceException(nameof(ManModBiomes.BiomeGroup_fields));
+            m_Biomes = ManModBiomes.BiomeGroup_fields?.FirstOrDefault(f => f?.Name != null && f.Name == "m_Biomes");
+            if (m_Biomes == null)
+                throw new NullReferenceException(nameof(m_Biomes));
+            m_BiomeWeights = ManModBiomes.BiomeGroup_fields?.FirstOrDefault(f => f?.Name != null && f.Name == "m_BiomeWeights");
+            if (m_BiomeWeights == null)
+                throw new NullReferenceException(nameof(m_BiomeWeights));
+            BiomeMap_T = typeof(BiomeMap);
+            if (BiomeMap_T == null)
+                throw new NullReferenceException(nameof(BiomeMap_T));
+            m_BiomeGroups = BiomeMap_T?.GetField("m_BiomeGroups", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (m_BiomeGroups == null)
+                throw new NullReferenceException(nameof(m_BiomeGroups));
+            m_BiomeGroupDatabase = BiomeMap_T?.GetField("m_BiomeGroupDatabase", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (m_BiomeGroupDatabase == null)
+                throw new NullReferenceException(nameof(m_BiomeGroupDatabase));
+        }
+
+        public void ModeExit(Mode mode)
         {
             CleanupGroups();
             CleanupBiomes();
             ManModBiomes.selector.Reset();
-            data = new SaveData();
+            ResetData();
             addSaveData = false;
         }
 
-        public void ModeStart(ManSaveGame.State optionalLoadState)
+        public void ModeStart(Mode mode)
+        {
+            SanityCheck();
+            if (ManModBiomes.selector == null)
+            {
+                ManModBiomes.InsureSelector();
+                if (ManModBiomes.selector == null)
+                    throw new NullReferenceException(nameof(ManModBiomes.selector));
+            }
+            ManModBiomes.selector.Resync();
+            InitiateBiomes(true);
+        }
+        internal void InitiateBiomes(bool WeAreLoading)
         {
             ManModBiomes.selector.useGUILayout = false;
-            if(optionalLoadState != null)
+            if (WeAreLoading)
             {
-                if (optionalLoadState.GetSaveData<SaveData>(saveType, out data))
-                {
-                    injectedBiomes = data.biomes.Select(i => ManModBiomes.biomeWrappers.Find(bw => bw.biome.name == i)).ToArray();
+                injectedBiomes = biomes.Select(i => ManModBiomes.biomeWrappers.Find(bw => bw.biome.name == i)).ToArray();
 
-                    injectedGroups = data.groups.Select(i => ManModBiomes.GetObjectFromUserResources<BiomeGroup>(i)).ToArray();
+                injectedGroups = groups.Select(i => ManModBiomes.GetObjectFromUserResources<BiomeGroup>(i)).ToArray();
 
-                    addSaveData = true;
-                }
+                addSaveData = true;
             }
             else
             {
                 injectedBiomes = BiomeSelector.biomes.Where(i => i.enabled).Select(i => i.biome).ToArray();
-                data.biomes = injectedBiomes.Select(i => i.biome.name).ToArray();
+                biomes = injectedBiomes.Select(i => i.biome.name).ToArray();
 
                 injectedGroups = BiomeSelector.groups.Where(i => i.enabled).Select(i => i.group).ToArray();
-                data.groups = injectedGroups.Select(i => i.name).ToArray();
+                groups = injectedGroups.Select(i => i.name).ToArray();
                 addSaveData = true;
             }
 
@@ -64,11 +110,19 @@ namespace Nuterra.World.Biomes
                 InjectGroups();
             }
         }
+        public void ForceReloadBiomesImmedeate()
+        {
+            CleanupGroups();
+            CleanupBiomes();
+            InitiateBiomes(true);
+        }
 
         public void Save(ManSaveGame.State saveState)
         {
-            if (addSaveData)
-                saveState.AddSaveData<SaveData>(saveType, data);
+            SanityCheck();
+            if (addSaveData) 
+            { 
+            }
             addSaveData = false;
         }
 
@@ -119,17 +173,24 @@ namespace Nuterra.World.Biomes
 
         void CleanupBiomes()
         {
+            SanityCheck();
             var MainBiomeMap = ManModBiomes.GetObjectFromGameResources<BiomeMap>("MainBiomeMap");
 
-            var groups = ((BiomeGroup[])m_BiomeGroups.GetValue(MainBiomeMap)).ToList();
-
-            foreach (var group in injectedGroups)
+            if (MainBiomeMap == null)
+                return;
+            try
             {
-                groups.Remove(group);
-            }
+                var groups = ((BiomeGroup[])m_BiomeGroups.GetValue(MainBiomeMap))?.ToList();
+                if (groups == null)
+                    return;
 
-            m_BiomeGroups.SetValue(MainBiomeMap, groups.ToArray());
-            ManModBiomes.LogAsset("Custom BiomeGroups removed from MainBiomeMap", ManModBiomes.MetaTag);
+                foreach (var group in injectedGroups)
+                    groups.Remove(group);
+
+                m_BiomeGroups.SetValue(MainBiomeMap, groups.ToArray());
+                ManModBiomes.LogAsset("Custom BiomeGroups removed from MainBiomeMap", ManModBiomes.MetaTag);
+            }
+            catch { }
 
             ResetBiomeDB(MainBiomeMap);
         }

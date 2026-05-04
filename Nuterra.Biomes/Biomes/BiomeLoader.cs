@@ -11,9 +11,6 @@ using UnityEngine.UI;
 
 namespace Nuterra.World.Biomes
 {
-    /// <summary>
-    /// Phased out and replaced with <see cref="ManModBiomes"/>
-    /// </summary>
     public class BiomeLoader : MonoBehaviour
     {
         public IEnumerator Start()

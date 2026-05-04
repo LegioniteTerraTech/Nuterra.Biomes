@@ -87,6 +87,9 @@ namespace Nuterra.World
                 DebugWorld.Log(Tag, "Error on RegisterSaveSystem - " + e);
             }
             PrepExternalChunksSceneryBiomes(true);
+
+            ManGameMode.inst.ModeSetupEvent.Subscribe(ManBiomeSave.inst.ModeStart);
+            ManGameMode.inst.ModeFinishedEvent.Subscribe(ManBiomeSave.inst.ModeExit);
         }
         private static void InitOptions()
         {

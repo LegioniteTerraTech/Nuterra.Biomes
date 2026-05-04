@@ -1,0 +1,36 @@
+{
+    "name": "ExampleHeightMap", // MapGenerator name. Used for referencing
+    "m_Layers": [ // Layers
+        {
+            "offset": { // Offset
+                "x": 0,
+                "y": 0
+            },
+            "scale": 1, // Scale
+            "rotation": 0, // Rotation
+            "scaleX": 1, // X scale
+            "scaleY": 1, // Y scale
+            "amplitude": 4, // Amplitude
+            "bias": 1, // Bias
+            "weight": 1, // Weight
+            "invert": false, // Invert
+            "function": "Zero", // Initial value function
+            // Valid function values (can also be referenced as a number starting from 0):
+            // Trig, Simplex, FastNoise, Voronoi1, Voronoi2, Voronoi3, Zero, One, MinusOne,
+            // FastNoiseQuant8, FastNoiseQuant8Smooth1, FastNoiseQuant8Smooth2, FastNoiseQuant8Smooth3,
+            // FastNoiseQuant16, FastNoiseQuant16Smooth1, FastNoiseQuant16Smooth2, FastNoiseQuant16Smooth3, FastNoiseAbs, SimplexAbs
+            "operations": [], // Operations applied to the initial value
+            "applyOperation": {
+                "param": 0, // Parameter of the operation
+                "index": 0, // Variable index
+                "code": "Null", // Operation code
+                // Valid code values (can also be referenced as a number starting from 0):
+                // Null, Add, Sub, Mul, Div, Min, Max, Abs, Sign, Quant, Store (store input in ), Modify
+                "buffered": false // Use the variable from the buffer at "index" as a parameter instead of "param"
+            }
+        }
+    ],
+    "m_UseLegacy": false, // Use legacy generation logic
+    "m_ScaleAll": 0, // Additional layers scale
+    "m_CutoffThreshold": 1 // Cutoff threshold
+}

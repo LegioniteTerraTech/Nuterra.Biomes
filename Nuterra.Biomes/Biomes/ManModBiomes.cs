@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Nuterra.World.PatchBatch;
 using TerraTechETCUtil;
 using UnityEngine;
+using static Circuits;
 
 namespace Nuterra.World.Biomes
 {
@@ -20,12 +21,12 @@ namespace Nuterra.World.Biomes
     /// <see cref="TerraTechETCUtil.ResourcesHelper"/> which has support for 
     /// <see cref="AssetBundle"/>s from <see cref="ModBase"/>s
     /// </summary>
-    public static class ManModBiomes
+    public class ManModBiomes
     {
         public const string Tag = ".Biomes";
         public const string ModBiomesName = ManModWorld.ModName + Tag;
-        internal static ManBiomeSave biomeSaveManager = new ManBiomeSave();
         internal static BiomeSelector selector;
+        internal static BiomeExtractor extractor;
         private static bool Init = false;
 
         public static readonly string BiomesFolderPath = Path.Combine(Application.dataPath, "../Custom Biomes");
@@ -49,26 +50,39 @@ namespace Nuterra.World.Biomes
         internal static readonly string BiomesTag = AssetsTag + "/Biomes";
         internal static readonly string BiomeGroupsTag = AssetsTag + "/BiomeGroups";
 
-        internal static Type BiomeGroup_T = typeof(BiomeGroup);
-        internal static FieldInfo[] BiomeGroup_fields = BiomeGroup_T.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        internal static Type BiomeGroup_T = default;
+        internal static FieldInfo[] BiomeGroup_fields = null;
 
+
+        internal static void InsureSelector()
+        {
+            if (selector != null)
+                return;
+            var holder = new GameObject();
+            extractor = holder.AddComponent<BiomeExtractor>();
+            selector = holder.AddComponent<BiomeSelector>();
+            selector.enabled = true;
+            selector.useGUILayout = false;
+            UnityEngine.Object.DontDestroyOnLoad(holder);
+        }
 
         public static void Load()
         {
-            ManModBiomes.LogAsset("Nuterra Biome Injector Library started");
+            LogAsset("Nuterra Biome Injector Library started");
+            BiomeGroup_T = typeof(BiomeGroup);
+            if (BiomeGroup_T == null)
+                throw new NullReferenceException(nameof(BiomeGroup_T));
+            BiomeGroup_fields = BiomeGroup_T?.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (BiomeGroup_fields == null)
+                throw new NullReferenceException(nameof(BiomeGroup_fields));
 
-            if (Init || !MassPatcher.MassPatchAllWithin(ManModWorld.harmonyInst, typeof(BiomePatches), ManModWorld.ModName, true))
+            if (Init || MassPatcher.MassPatchAllWithin(ManModWorld.harmonyInst, typeof(BiomePatches), ManModWorld.ModName, true))
             {
-                var holder = new GameObject();
-                holder.AddComponent<BiomeExtractor>();
-                selector = holder.AddComponent<BiomeSelector>();
-                selector.enabled = false;
-                selector.useGUILayout = false;
+                InsureSelector();
 
-                UnityEngine.Object.DontDestroyOnLoad(holder);
                 if (!Init)
                 {
-                    BeginMassLoading();
+                    InitiateMassLoading();
                     Init = true;
                 }
             }
@@ -76,23 +90,31 @@ namespace Nuterra.World.Biomes
                 DebugWorld.LogError(Tag, "Rebuilding lookup FAILED! " + nameof(BiomePatches) + " didn't load!");
         }
 
-        internal static void LogAsset(string value, string tag = "")
+        internal static string LogAsset(string value, string tag = "")
         {
-            Console.WriteLine(string.Format("[" + ModBiomesName + "{0}] {1}", tag, value));
+            string outS = string.Format("[" + ModBiomesName + "{0}] {1}", tag, value);
+            Console.WriteLine(outS);
+            return outS;
         }
 
         internal static void LogError(string value, string tag = "")
         {
-            LogAsset("Error: " + value, tag);
+            string error = LogAsset("Error: " + value, tag);
+            if (ManModWorld.DisplayErrorsToUser)
+                ManModGUI.ShowErrorPopup(error, false);
         }
 
         internal static void LogFileError(FileInfo file, string e, string tag = "")
         {
-            LogAsset(string.Format("Error while loading \"{0}\" :\n{1}", Path.Combine(file.Directory.Name, file.Name), e), tag);
+            string error = LogAsset(string.Format("Error while loading \"{0}\" :\n{1}", Path.Combine(file.Directory.Name, file.Name), e), tag);
+            if (ManModWorld.DisplayErrorsToUser)
+                ManModGUI.ShowErrorPopup(error, false);
         }
         internal static void LogAssetBundleError(ModDataHandle handle, string e, string tag = "")
         {
-            LogAsset(string.Format("Error while loading \"{0}\" :\n{1}", handle.ModID, e), tag);
+            string error = LogAsset(string.Format("Error while loading \"{0}\" :\n{1}", handle.ModID, e), tag);
+            if (ManModWorld.DisplayErrorsToUser)
+                ManModGUI.ShowErrorPopup(error, false);
         }
 
         public static string StripComments(string input)
@@ -215,17 +237,22 @@ namespace Nuterra.World.Biomes
             return (T)GetObjectFromResources(typeof(T), name);
         }
 
-
-        public static void BeginMassLoading()
+        internal static bool DoingReboot = false;
+        public static void InitiateMassLoading()
         {
+            if (DoingReboot)
+                return;
+            DoingReboot = true;
+            ReadyTextures = false;
+            ReadyTerrainLayers = false;
+            ReadyMapGenerators = false;
+            ReadyBiomes = false;
+            ReadyBiomeGroups = false;
             InvokeHelper.InvokeCoroutine(LoadAllTextures());
-            InvokeHelper.InvokeCoroutine(LoadAllTerrainLayers());
-            InvokeHelper.InvokeCoroutine(LoadAllMapGenerators());
-            InvokeHelper.InvokeCoroutine(LoadAllBiomes());
-            InvokeHelper.InvokeCoroutine(LoadAllBiomeGroups());
         }
 
-        public static IEnumerator LoadAllTextures()
+        private static bool ReadyTextures = false;
+        internal static IEnumerator LoadAllTextures()
         {
             LogAsset("Loading PNGs from assetBundles...", TexturesTag);
             foreach (var item in ResourcesHelper.IterateAllModAssetsBundle<Texture2D>())
@@ -246,7 +273,7 @@ namespace Nuterra.World.Biomes
                         {
                             LogAssetBundleError(item.Key, e.ToString(), TexturesTag);
                         }
-                        yield return null;
+                        yield return new WaitForEndOfFrame();
                     }
                     else
                     {
@@ -277,14 +304,15 @@ namespace Nuterra.World.Biomes
                     {
                         LogFileError(file, e.ToString(), TexturesTag);
                     }
-                    yield return null;
+                    yield return new WaitForEndOfFrame();
                 }
                 else
                 {
                     LogError(string.Format("Texture(file) \"{0}\" already exists!", name), TexturesTag);
                 }
             }
-
+            ReadyTextures = true;
+            InvokeHelper.InvokeCoroutine(LoadAllTerrainLayers());
             yield break;
         }
 
@@ -344,7 +372,8 @@ namespace Nuterra.World.Biomes
         }
         */
 
-        public static IEnumerator LoadAllTerrainLayers()
+        private static bool ReadyTerrainLayers = false;
+        internal static IEnumerator LoadAllTerrainLayers()
         {
             var layers = BiomesFolder.GetFiles("*" + TerrainLayerExtension, SearchOption.AllDirectories);
             LogAsset("Loading TerrainLayers", TerrainLayersTag);
@@ -386,13 +415,17 @@ namespace Nuterra.World.Biomes
                     LogFileError(file, e.ToString(), TerrainLayersTag);
                 }
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
 
+            ReadyTerrainLayers = true;
+            LogAsset("TerrainLayers loaded", TerrainLayersTag);
+            InvokeHelper.InvokeCoroutine(LoadAllMapGenerators());
             yield break;
         }
 
-        public static IEnumerator LoadAllMapGenerators()
+        private static bool ReadyMapGenerators = false;
+        internal static IEnumerator LoadAllMapGenerators()
         {
             var m_Layers = typeof(MapGenerator).GetField("m_Layers", BindingFlags.Instance | BindingFlags.NonPublic);
             var generators = BiomesFolder.GetFiles("*" + MapGeneratorExtension, SearchOption.AllDirectories);
@@ -448,13 +481,17 @@ namespace Nuterra.World.Biomes
                     LogFileError(file, e.ToString(), MapGeneratorsTag);
                 }
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
 
+            ReadyMapGenerators = true;
+            LogAsset("MapGenerators loaded", MapGeneratorsTag);
+            InvokeHelper.InvokeCoroutine(LoadAllBiomes());
             yield break;
         }
 
-        public static IEnumerator LoadAllBiomes()
+        private static bool ReadyBiomes = false;
+        internal static IEnumerator LoadAllBiomes()
         {
             var Biome_T = typeof(Biome);
             var fields = Biome_T.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -573,11 +610,15 @@ namespace Nuterra.World.Biomes
                     LogFileError(file, e.ToString(), BiomesTag);
                 }
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
+            ReadyBiomes = true;
+            LogAsset("Biomes loaded", BiomesTag);
+            InvokeHelper.InvokeCoroutine(LoadAllBiomeGroups());
         }
 
-        public static IEnumerator LoadAllBiomeGroups()
+        private static bool ReadyBiomeGroups = false;
+        internal static IEnumerator LoadAllBiomeGroups()
         {
             var biomeGroups = BiomesFolder.GetFiles("*" + BiomeGroupsExtension, SearchOption.AllDirectories);
             LogAsset("Loading BiomesGroups", BiomesTag);
@@ -642,8 +683,53 @@ namespace Nuterra.World.Biomes
                     LogFileError(file, e.ToString(), BiomeGroupsTag);
                 }
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
+            }
+            ReadyBiomeGroups = true;
+            LogAsset("BiomesGroups loaded", BiomeGroupsTag);
+            InvokeHelper.InvokeCoroutine(EnsureLoadComplete());
+        }
+
+
+        private static IEnumerator EnsureLoadComplete()
+        {
+            LogAsset("EnsureLoadComplete");
+            while (true)
+            {
+                if (ReadyTextures && ReadyTerrainLayers && ReadyMapGenerators &&
+                    ReadyBiomes && ReadyBiomeGroups)
+                {   // Good to go, START!!!
+                    if (DoingReboot)
+                    {
+                        DoingReboot = false;
+                        ManWorld.inst.CurrentBiomeMap?.InvalidateBiomeDB();
+                        ManWorldTileExt.HostOnly_ReloadENTIREScene(true);
+                        ManBiomeSave.inst.ForceReloadBiomesImmedeate();
+                        yield return new WaitForEndOfFrame();
+                        LogAsset("RELOADED BIOMES");
+                    }
+                    yield break;
+                }
+                yield return new WaitForEndOfFrame();
             }
         }
+
+        internal static void FORCE_THIS_BIOME_LOADED_IMMEDEATE(Biome biome)
+        {
+            ToFORCELOAD2 = null;
+            ToFORCELOAD = biome;
+            ManWorld.inst.CurrentBiomeMap?.InvalidateBiomeDB();
+            ManWorldTileExt.HostOnly_ReloadENTIREScene(true);
+        }
+        internal static void FORCE_THIS_BIOMEGROUP_LOADED_IMMEDEATE(BiomeGroup biomeGroup)
+        {
+            ToFORCELOAD = null;
+            ToFORCELOAD2 = biomeGroup;
+            ManWorld.inst.CurrentBiomeMap?.InvalidateBiomeDB();
+            ManWorldTileExt.HostOnly_ReloadENTIREScene(true);
+        }
+        public static Biome ToFORCELOAD = null;
+        public static BiomeGroup ToFORCELOAD2 = null;
+
     }
 }

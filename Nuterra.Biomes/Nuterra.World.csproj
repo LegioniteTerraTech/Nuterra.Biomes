@@ -159,8 +159,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BiomeCommands.cs" />
+    <Compile Include="Biomes\BiomeGeneration.cs" />
     <Compile Include="Biomes\BiomeSelector.cs" />
     <Compile Include="Biomes\BiomeWrapper.cs" />
+    <Compile Include="Biomes\GenLayerExt.cs" />
     <Compile Include="Chunks\ChunkMaker.cs" />
     <Compile Include="Chunks\ManModChunks.cs" />
     <Compile Include="DebugWorld.cs" />
