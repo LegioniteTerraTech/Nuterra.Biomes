@@ -15,6 +15,24 @@ namespace Nuterra.World.PatchBatch
     /// </summary>
     internal class BiomePatches
     {
+        internal static class ModuleLight_Patches
+        {
+            internal static Type target = typeof(ModuleLight);
+            /// <summary>
+            /// LightsInTheDarkBiomesDuringDay
+            /// </summary>
+            [HarmonyPriority(-9001)]
+            internal static void EnableLights_Prefix(ModuleLight __instance, ref bool enable)
+            {
+                if (__instance.block?.tank)
+                {
+                    var weights = ManWorld.inst.GetBiomeWeightsAtScenePosition(__instance.block.tank.boundsCentreWorldNoCheck);
+                    if (weights.Valid && ManModBiomes.DarkInDayBiomes.Contains(weights.Biome(0)))
+                        enable = true;
+                }
+            }
+        }
+        
         internal static class UIScreenNewGame_Patches
         {
             internal static Type target = typeof(UIScreenNewGame);
@@ -42,7 +60,7 @@ namespace Nuterra.World.PatchBatch
                 ManModBiomes.selector.useGUILayout = false;
             }
         }
-        internal static class AddOceanicBiomes_Patches
+        internal static class AddMOARBiomes_Patches
         {
             internal static Type target = typeof(BiomeMap);
             /// <summary>
@@ -51,7 +69,7 @@ namespace Nuterra.World.PatchBatch
             [HarmonyPriority(-9001)]
             internal static void GetBiomeDB_Prefix(BiomeMap __instance)
             {
-                BiomeGeneration.OnBiomesReloaded(__instance);
+                //BiomeGeneration.OnBiomesReloaded(__instance);
             }
         }
 

@@ -6,6 +6,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using static Circuits;
 
 
 namespace Nuterra.World.Biomes
@@ -63,7 +64,7 @@ namespace Nuterra.World.Biomes
             }
         };
 
-        static readonly JsonConverter biomeConverter = new JsonConverters.UnityObjectConverter<Biome>();
+        static readonly JsonConverter biomeConverter = new JsonConverters.BiomeConverter();
         static readonly JsonConverter colorConverter = new JsonConverters.ColorConverter();
         static readonly JsonConverter terrainLayerConverter = new JsonConverters.UnityObjectConverter<TerrainLayer>();
         static readonly JsonConverter mapGeneratorConverter = new JsonConverters.UnityObjectConverter<MapGenerator>();
@@ -177,6 +178,8 @@ namespace Nuterra.World.Biomes
 
             GUI.Window(ID, rect, DoWindow, "Biomes Extractor");
         }
+        internal static string ExtractBiome(Biome biome) =>
+             JObject.FromObject(biome, biomeSerializer).ToString(Formatting.Indented);
 
         void DoWindow(int id)
         {
@@ -208,7 +211,7 @@ namespace Nuterra.World.Biomes
                         if (GUILayout.Button(group.name, maxWidth))
                         {
                             var filename = group.name + ManModBiomes.BiomeGroupsExtension;
-                            var json = JObject.FromObject(group, groupSerializer).ToString(Formatting.Indented);
+                            var json =  JObject.FromObject(group, groupSerializer).ToString(Formatting.Indented);
                             File.WriteAllText(Path.Combine(GroupsFolder, filename), json);
                         }
                     }
@@ -222,7 +225,7 @@ namespace Nuterra.World.Biomes
                     foreach (var biome in biomes)
                     {
                         var filename = biome.name + ManModBiomes.BiomesExtension;
-                        var json = JObject.FromObject(biome, biomeSerializer).ToString(Formatting.Indented);
+                        var json = ExtractBiome(biome);
                         File.WriteAllText(Path.Combine(BiomesFolder, filename), json);
                     }
                 }

@@ -12,7 +12,7 @@ namespace Nuterra.World
 {
     public static class DebugWorld
     {
-        public const string ModName = ManModWorld.ModName;
+        private const string ModName = ManModWorld.ModLogName;
 
         internal static bool ShouldLog = true;
         internal static bool ShouldLogRails = true;
@@ -41,25 +41,25 @@ namespace Nuterra.World
         {
             if (!ShouldLog)
                 return;
-            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, StackTraceUtility.ExtractStackTrace().ToString(), message));
+            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, message, StackTraceUtility.ExtractStackTrace().ToString()));
         }
         internal static void Assert(string tag, bool shouldAssert, string message)
         {
             if (!ShouldLog || !shouldAssert)
                 return;
-            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, StackTraceUtility.ExtractStackTrace().ToString(), message));
+            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, message, StackTraceUtility.ExtractStackTrace().ToString()));
         }
         internal static void LogError(string tag, string message)
         {
             if (!ShouldLog)
                 return;
-            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, StackTraceUtility.ExtractStackTrace().ToString(), message));
+            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, message, StackTraceUtility.ExtractStackTrace().ToString()));
         }
         internal static void LogDevOnly(string tag, string message)
         {
             if (!LogDev)
                 return;
-            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, StackTraceUtility.ExtractStackTrace().ToString(), message));
+            Debug.Log(string.Format("[" + ModName + "{0}] {1}\n{2}", tag, message, StackTraceUtility.ExtractStackTrace().ToString()));
         }
         internal static void FatalError(string e)
         {

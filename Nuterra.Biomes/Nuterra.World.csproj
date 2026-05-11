@@ -40,6 +40,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="TerraTechETCUtil, Version=1.4.104.25, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\TTETCUtil\TerraTechETCUtil\TerraTechETCUtil\bin\Steam\TerraTechETCUtil.dll</HintPath>
+    </Reference>
     <Reference Include="0Harmony">
       <HintPath>..\..\TTETCUtil\TerraTechETCUtil\TerraTechETCUtil\bin\Steam\0Harmony.dll</HintPath>
     </Reference>
@@ -77,12 +81,16 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="TerraTechETCUtil, Version=1.4.104.25, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="TerraTechETCUtil, Version=1.4.127.7, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\TTETCUtil\TerraTechETCUtil\TerraTechETCUtil\bin\Steam\TerraTechETCUtil.dll</HintPath>
     </Reference>
     <Reference Include="TimeOfDay">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\TerraTech\TerraTechWin64_Data\Managed\TimeOfDay.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TTModManager">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\285920\2790161231\TTModManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
@@ -159,7 +167,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BiomeCommands.cs" />
+    <Compile Include="Biomes\SuperBiome.cs" />
+    <Compile Include="WorldCommands.cs" />
     <Compile Include="Biomes\BiomeGeneration.cs" />
     <Compile Include="Biomes\BiomeSelector.cs" />
     <Compile Include="Biomes\BiomeWrapper.cs" />
@@ -174,8 +183,11 @@
     <Compile Include="ModLoading\JsonConverters.cs" />
     <Compile Include="Biomes\ManBiomeSave.cs" />
     <Compile Include="Chunks\CustomChunk.cs" />
+    <Compile Include="NuterraRes.cs" />
+    <Compile Include="PatchBatch\ModManagerPatches.cs" />
     <Compile Include="PatchBatch\BiomePatches.cs" />
     <Compile Include="PatchBatch\ChunkPatches.cs" />
+    <Compile Include="PatchBatch\GlobalPatches.cs" />
     <Compile Include="PatchBatch\Patches.cs" />
     <Compile Include="PatchBatch\SceneryPatches.cs" />
     <None Include="Recipes\CustomRecipie.cs" />
@@ -185,7 +197,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Biomes\ManModBiomes.cs" />
     <Compile Include="WikiWorld.cs" />
-    <Compile Include="Biomes\BiomeLoader.cs" />
+    <None Include="Biomes\BiomeLoader.cs" />
     <Compile Include="Scenery\SceneryMaker.cs" />
     <Compile Include="Scenery\ManModScenery.cs" />
   </ItemGroup>
@@ -231,7 +243,7 @@ xcopy /S /Y /R "!e:~0,-1!" !modpath!
 )
 
 
-set modpath2="C:\Users\Legionite\Desktop\Advanced AI\Assets\Mods\Nuterra World Beta"
+set modpath2="C:\Users\Legionite\Desktop\Advanced AI\Assets\Mods\NuterraWorld Beta"
 
 if exist !modpath2! (
 if $(ConfigurationName) == Release (

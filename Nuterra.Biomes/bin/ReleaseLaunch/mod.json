@@ -1,0 +1,10 @@
+{
+    "Id": "nuterra.world",
+    "DisplayName": "Nuterra World Injector Library",
+    "Author": "Exund",
+    "Version": "1.0.0",
+    "Enable": true,
+    "AssemblyName": "NuterraWorld.dll",
+    "EntryMethod": "KickstartWorld.Init",
+    "Priority": "First"
+}

@@ -15,7 +15,7 @@ namespace Nuterra.World.Biomes
     {
         public IEnumerator Start()
         {
-            ManModBiomes.LogAsset("Asset loading started", ManModBiomes.MetaTag);
+            NuterraRes.LogAsset("Asset loading started", ManModBiomes.MetaTag);
             yield return StartCoroutine(ManModBiomes.LoadAllTextures());
             //yield return StartCoroutine(Resources.LoadAllMeshes());
             //yield return StartCoroutine(Resources.LoadAllAudioClips());
@@ -23,9 +23,10 @@ namespace Nuterra.World.Biomes
             yield return StartCoroutine(ManModBiomes.LoadAllMapGenerators());
             yield return StartCoroutine(ManModBiomes.LoadAllBiomes());
             yield return StartCoroutine(ManModBiomes.LoadAllBiomeGroups());
-            ManModBiomes.LogAsset("Asset loading ended", ManModBiomes.MetaTag);
+            NuterraRes.LogAsset("Asset loading ended", ManModBiomes.MetaTag);
 
-            if (ManModBiomes.biomeWrappers.Count > 0 || ManModBiomes.userResources.ContainsKey(typeof(BiomeGroup)) && ManModBiomes.userResources[typeof(BiomeGroup)].Count > 0)
+            if (ManModBiomes.biomeWrappers.Count > 0 || ManModBiomes.userResources.ContainsKey(typeof(BiomeGroup)) && 
+                ManModBiomes.userResources[typeof(BiomeGroup)].obj.Count > 0)
             {
                 var m_ModePlayPrefab = typeof(UIGameMode).GetField("m_ModePlayPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
                 var m_ModePlayPrefabNoTwitter = typeof(UIGameMode).GetField("m_ModePlayPrefabNoTwitter", BindingFlags.NonPublic | BindingFlags.Instance);

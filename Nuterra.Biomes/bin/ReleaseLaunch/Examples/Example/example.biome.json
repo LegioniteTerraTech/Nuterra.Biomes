@@ -1,0 +1,359 @@
+{
+	"name": "Example", // Biome name. Used for referencing
+	"Reference": "CanyonsBiome", // Name of the vanilla biome to use as a base
+	"BiomeGroupNames": [ // Names of the BiomeGroups into which this biome will be added
+		"GrasslandGroupStart",
+		"DesertGroupBasic"
+	],
+	"BiomeWeights": [ // Weights of the biome in the biome groups specified by BiomeGroupNames. Defaults to 1
+		2
+	],
+	"editorRenderColour": { // Editor render color
+		"r": 0,
+		"g": 0,
+		"b": 1,
+		"a": 1
+	},
+	"heightMapGenerator": "ExampleHeightMap", // Name of MapGenerator used for terrain height generation
+	//"multiTextureGenerator": "BasicGrasslandBlendMap", // Name of MapGenerator used for terrain texture blending
+	"layers": [ // Detail layers (clutter, resource nodes)
+		{
+			"generator": "BasicGrasslandAllRocks", // Name of the MapGenerator
+			"distributor": { // Scenery distributor
+				"layer0Translation": { // Layer 0 translation
+					"x": 0,
+					"y": 0
+				},
+				"layer0Rotation": 0, // Layer 0 rotation
+				"layer0Scale": 0.5, // Layer 0 scale
+				"layer0DistMethod": "Length2", // Layer 0 distance method
+				"layer1Translation": { // Layer 0 translation
+					"x": 0,
+					"y": 0
+				},
+				"layer1Rotation": 0, // Layer 1 rotation
+				"layer1Scale": 0.05, // Layer 1 scale
+				"layer1DistMethod": "Length4", // Layer 1 distance method
+				"bandTolerance": 0, // Band tolerence
+				"enableRegions": false, // Enable regions
+				"spawnModifiers": [], // Spawn modifiers
+				"decoration": { // Decoration
+					"weightingTag": "", // Tag
+					"terrainObject": [ // Names of the TerrainObjects
+						"LuxiteOutcrop1"
+					]
+				},
+				"basic": { // Basic
+					"weightingTag": "",
+					"terrainObject": [
+						"RockGrassland",
+						"Sign_Minefield"
+					]
+				},
+				"variants": [ // Variants
+					{
+						"weightingTag": "plumbite",
+						"terrainObject": [
+							"RockGrassland_PlumbiteSeam"
+						]
+					},
+					{
+						"weightingTag": "titanite",
+						"terrainObject": [
+							"RockGrassland_TitaniteSeam"
+						]
+					}
+				],
+				"nonBasicThreshold": 0.84, // Non basic objects threshold
+				"upgradeRules": [] // Upgrade rules
+			}
+		}
+	],
+	"m_MainMaterialLayer": "EXAMPLE_TerrainLayer", // Main TerrainLayer name
+	"m_AltMaterialLayer": "Rock_Light_TerrainLayer" // Alternative TerrainLayer name 
+	
+	/*"textureBlendSteepnessRange": {
+		"x": 0,
+		"y": 0.04
+	},
+	"textureBlendSteepnessWeighting": 0.5,
+	"m_DayLighting": {
+		"m_SunOrMoonColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0.9921569,
+						"g": 0.9921569,
+						"b": 0.9921569,
+						"a": 1
+					}
+				},
+				{
+					"time": 0.7237659266041047,
+					"color": {
+						"r": 0.9882353,
+						"g": 0.9921569,
+						"b": 0.9647059,
+						"a": 1
+					}
+				},
+				{
+					"time": 0.8757610437170977,
+					"color": {
+						"r": 0.9803922,
+						"g": 1,
+						"b": 0.6666667,
+						"a": 1
+					}
+				},
+				{
+					"time": 1,
+					"color": {
+						"r": 0.9921569,
+						"g": 0.6705883,
+						"b": 0.1960784,
+						"a": 1
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_LightColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_RayColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_SkyColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_CloudColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_FogColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_AmbientColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_DustVFXColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		}
+	},
+	"m_NightLighting": {
+		"m_SunOrMoonColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_LightColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_RayColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_SkyColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_CloudColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_FogColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_AmbientColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		},
+		"m_DustVFXColour": {
+			"colorKeys": [
+				{
+					"time": 0,
+					"color": {
+						"r": 0,
+						"g": 0,
+						"b": 0,
+						"a": 0
+					}
+				}
+			],
+			"mode": 0
+		}
+	},
+	"m_CloudParams": {
+		"m_Clouds": {
+			"Size": 2,
+			"Opacity": 1,
+			"Coverage": 0.3,
+			"Sharpness": 0.5,
+			"Attenuation": 0.5,
+			"Saturation": 0.5,
+			"Scattering": 1,
+			"Brightness": 1.5
+		}
+	},
+	"m_DustVFXColor": { // Wheels dust particles color
+		"r": 0.4588235,
+		"g": 0.4431373,
+		"b": 0.2470588,
+		"a": 0.3137255
+	},
+	"impactEffects": [], // Projectiles impact effects
+	"m_AllowLandmarks": true,
+	"m_AllowVendors": true,
+	"m_AllowStuntRamps": false,
+	"surfaceFriction": 0.9,
+	"m_BiomeType": 0*/
+}

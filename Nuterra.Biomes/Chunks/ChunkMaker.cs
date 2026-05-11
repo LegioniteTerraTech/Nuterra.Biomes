@@ -39,11 +39,17 @@ namespace Nuterra.World.Chunks
             }
         }
 
+        /// <summary>
+        /// Will have to convert this to <see cref="CustomChunk"/> style later on...
+        /// <para>Wait this is already using the existing ID range, <i>it's fiiiiine....</i></para>
+        /// </summary>
         public static void RenewOldChunks()
         {
+            if (foundryRecipes != null)
+                return;
             InsureFoundryRecipes();
             DebugWorld.Log(ManModChunks.Tag, "FindOldChunks - Renewing unused Chunks...");
-            int stepper = 420;
+            int stepper = 350;
             Dictionary<int, int> vars = (Dictionary<int, int>)ManModChunks.ResLook.GetValue(null);
             Dictionary<int, int> vars2 = (Dictionary<int, int>)ManModChunks.ResLook2.GetValue(null);
             var defaultS = ManUI.inst.m_SpriteFetcher.GetSprite(ObjectTypes.Block, -1);
@@ -194,23 +200,29 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 500;
                             break;
                         case ChunkTypes._deprecated_ChristmasPresent4:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Surprise");
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Bulk Chunk");//"Surprise");
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
-                                "Hmm, what lies within?");
-                            ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Component);
+                                "A mysterious ore that shines brighter than silver...\nSome say that it could be refined endlessly...");
+                                //"Hmm, what lies within?");
+                            //ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Component);
+                            ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Raw);
                             if (def.saleValue == 0)
                                 def.saleValue = 500;
                             break;
                         case ChunkTypes._deprecated_Stone:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Stone");
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Bulk Element");//"Stone");
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
-                                "Absolutely useless.  This has practically no use. Not even the trading stations want it...");
-                            ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Component);
+                                "A tiny fragment of what appears to be something much greater...\nYou are going to need more of this...");
+                            /*
+                        LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
+                            "Absolutely useless.  This has practically no use. Not even the trading stations want it...");//*/
+                            //ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Component);
+                            ManSpawn.inst.VisibleTypeInfo.SetDescriptor(hash, ChunkCategory.Refined);
                             if (def.saleValue == 0)
                                 def.saleValue = -1;
                             break;
                         case ChunkTypes._deprecated_HeartOre:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Heart Ore");//"Cardiacite"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Constructium");//"Heart Ore");//"Cardiacite"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "An extremely rare ore, \"Cardiacite\" is used in the creation of even greater intelligences.\n" +
                                 "Why it has self-repairing properties like Luxite, but unlike it's yellow fellow, it can " +
@@ -221,7 +233,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 327;
                             break;
                         case ChunkTypes._deprecated_HeartCrystal:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Heart Crystal");//"Cardiac Prism"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Constructmite");//"Heart Crystal");//"Cardiac Prism"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "Used in the creation of reality-bending, self-replicating machines.\nBeware of the singularity!\n" +
                                 "Some believe it was the aftermath of a mighty widespread nano-machine race.  That's bogus!");
@@ -229,7 +241,7 @@ namespace Nuterra.World.Chunks
                             def.saleValue = 863;
                             break;
                         case ChunkTypes._deprecated_CommOre:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Comm Ore");//"Magellus Fragment"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Plasmite");//"Comm Ore");//"Magellus Fragment"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "A mysterious material bursting with tiny explosive electrical sparks.  Looks alien in origin." +
                                 "\nAffectionately known as \"Plasmite\" amongst many nations out there, this ore posesses " +
@@ -242,7 +254,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 291;
                             break;
                         case ChunkTypes._deprecated_CommCrystal:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Comm Crystal");//Magellus Compound
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Plasmonium");//"Comm Crystal");//Magellus Compound
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "The basis for excessively powerful energy manipulation weapons like E.P.M.C." +
                                 "\nComm Crystals have the most fine-grained command over the wide spectrum of energies." +
@@ -252,7 +264,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 442;
                             break;
                         case ChunkTypes._deprecated_SenseOre:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Sense Ore");//"Adaranthium"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Staalrite");//"Adaranthium"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "It is prized for it's powerful 3D detection and space-time bending properties." +
                                 "\nThis originates from vibrant seas of <b>Adaranth</b>, a distant planet several parsecs away from the Off-World." +
@@ -263,7 +275,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 4321;
                             break;
                         case ChunkTypes._deprecated_SenseCrystal:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Sense Crystal");//"Adaranth Ingot"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Staalronium");//"Adaranth Ingot"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "Used in the creation of devices which detect in the 3rd dimension as well as bend space-time. " +
                                 "\nA beautiful pearl-like crystal worthy for a king or queen." +
@@ -274,7 +286,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 5263;
                             break;
                         case ChunkTypes._deprecated_SmallMetalOre:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Small Metal Ore");//"Tessellium"
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Tessellium");//"Small Metal Ore");//"Tessellium"
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "Extremely tough and durable, this stellar metal ore is no ordinary Earth metal.\n" +
                                 "It binds effortlessly to other metals, and becomes even stronger in the process.\n" +
@@ -285,7 +297,7 @@ namespace Nuterra.World.Chunks
                                 def.saleValue = 103636;
                             break;
                         case ChunkTypes._deprecated_SmallMetalIngot:
-                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Small Metal Ingot");//Tesseract
+                            LocalisationExt.RegisterRawEng(StringBanks.ChunkName, stepper, "Lemurian Steel");//"Small Metal Ingot");//Tesseract
                             LocalisationExt.RegisterRawEng(StringBanks.ChunkDescription, stepper,
                                 "The ultimate building material.  \nA critical component for any bulky, tough armors " +
                                 "that could take an onslaught from an entire armada.");
@@ -318,9 +330,11 @@ namespace Nuterra.World.Chunks
                                 }, new ItemTypeInfo(ObjectTypes.Chunk, stepper));
                             break;
                     }
+                    new WikiPageChunk((int)CT, ManIngameWiki.InsureChunksWikiGroup(ManModWorld.ModID));
+                    stepper++;
                 }
-                stepper++;
             }
+            DebugWorld.Log(ManModChunks.Tag, "FindOldChunks - Added " + (stepper - 350) + " chunks");
             AddRecipesForOldChunks();
         }
 

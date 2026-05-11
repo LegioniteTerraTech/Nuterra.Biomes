@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -11,6 +12,17 @@ using UnityEngine;
 
 namespace Nuterra.World.JsonConverters
 {
+    public class BiomeConverter : UnityObjectConverter<Biome>
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(Biome).IsAssignableFrom(objectType);
+        }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return base.ReadJson(reader, typeof(SuperBiome), existingValue, serializer);
+        }
+    }
     public class UnityObjectConverter<T> : JsonConverter where T : UnityEngine.Object
     {
         public override bool CanConvert(Type objectType)
@@ -20,7 +32,7 @@ namespace Nuterra.World.JsonConverters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return ManModBiomes.GetObjectFromResources(objectType, reader.Value.ToString());
+            return NuterraRes.GetObjectFromResources(objectType, reader.Value.ToString());
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

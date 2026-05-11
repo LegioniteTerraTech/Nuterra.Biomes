@@ -26,7 +26,7 @@ namespace Nuterra.World
         }
         internal static void InitChunks()
         {
-            var group = ManIngameWiki.InsureChunksWikiGroup(ManModWorld.ModName);
+            var group = ManIngameWiki.InsureChunksWikiGroup(ManModWorld.ModID);
             foreach (var item in ChunkMaker.Resurrected)
             {
                 new WikiPageChunk((int)item, group);
@@ -64,10 +64,15 @@ namespace Nuterra.World
                     Directory.CreateDirectory(path);
                 ManModWorld.OpenInExplorer(path);
             }
-            if (AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLarge))
+
+            if (ManModChunks.InProgress != null)
             {
-                ManModChunks.PrepareAllChunks(true);
+                AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLargeActive);
+                AltUI.Tooltip.GUITooltip(ManModChunks.InProgress);
             }
+            else if (AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLarge))
+                InvokeHelper.InvokeCoroutine(ManModChunks.PrepareAllChunks(true));
+
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal(AltUI.TextfieldBlackHuge);
             GUILayout.Label("Custom Scenery: ", AltUI.LabelBlueTitle);
@@ -79,21 +84,15 @@ namespace Nuterra.World
                 path = Path.Combine(exportsPath, "SceneryInfoDump.json");
                 var LCS = new List<CustomScenery>();
                 var iterated = new HashSet<string>();
-                foreach (var sc in SpawnHelper.IterateSceneryTypes())
+                foreach (var sc in SpawnHelper.IterateAllScenery())
                 {
-                    foreach (var sc2 in sc)
+                    if (sc.Value != null && iterated.Add(sc.Key))
                     {
-                        foreach (var val in sc2.Value)
+                        var refP = ManModScenery.ExtractFromExisting(sc.Value);
+                        if (refP != null)
                         {
-                            if (val != null && iterated.Add(val.name))
-                            {
-                                var refP = ManModScenery.ExtractFromExisting(val);
-                                if (refP != null)
-                                {
-                                    LCS.Add(refP);
-                                    break;
-                                }
-                            }
+                            LCS.Add(refP);
+                            break;
                         }
                     }
                 }
@@ -110,10 +109,13 @@ namespace Nuterra.World
                     Directory.CreateDirectory(path);
                 ManModWorld.OpenInExplorer(path);
             }
-            if (AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLarge))
+            if (ManModScenery.InProgress != null)
             {
-                ManModScenery.PrepareAllScenery(true);
+                AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLargeActive);
+                AltUI.Tooltip.GUITooltip(ManModScenery.InProgress);
             }
+            else if (AltUI.Button("Reload", ManSFX.UISfxType.Enter, AltUI.ButtonBlueLarge))
+                InvokeHelper.InvokeCoroutine(ManModScenery.PrepareAllScenery(true));
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
